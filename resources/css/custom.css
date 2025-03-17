@@ -1,0 +1,379 @@
+/* Custom UI Enhancements */
+
+/* Login Page Styles */
+.login-logo {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+/* Sidebar Styles */
+.drawer-side aside {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.drawer-side aside > div:nth-child(2) {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.drawer-side aside > div:nth-child(2)::-webkit-scrollbar {
+  width: 4px;
+}
+
+.drawer-side aside > div:nth-child(2)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.drawer-side aside > div:nth-child(2)::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 20px;
+}
+
+.sidebar-menu-item {
+  @apply flex items-center p-3 rounded-lg transition-all duration-200;
+}
+
+.sidebar-menu-item:hover {
+  @apply bg-gray-100 dark:bg-gray-700;
+}
+
+.sidebar-menu-item.active {
+  @apply bg-primary bg-opacity-10 dark:bg-primary dark:bg-opacity-20;
+}
+
+.sidebar-menu-item .sidebar-icon {
+  @apply flex items-center justify-center w-8 h-8 rounded-lg text-white;
+  transition: all 0.3s ease;
+}
+
+.sidebar-menu-item:hover .sidebar-icon {
+  transform: translateY(-2px);
+}
+
+.sidebar-menu-item.active .sidebar-icon {
+  @apply bg-primary;
+}
+
+.sidebar-menu-item .sidebar-text {
+  @apply ml-3 font-medium text-gray-700 dark:text-gray-200;
+}
+
+/* Dark Mode Styles */
+[data-theme='dark'] .login-logo {
+  animation: pulse-dark 2s infinite;
+}
+
+@keyframes pulse-dark {
+  0% {
+    box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(96, 165, 250, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(96, 165, 250, 0);
+  }
+}
+
+[data-theme='dark'] .card-enhanced {
+  @apply bg-gray-800 text-white border-gray-700;
+}
+
+[data-theme='dark'] .input-enhanced, 
+[data-theme='dark'] .select-enhanced, 
+[data-theme='dark'] .textarea-enhanced {
+  @apply bg-gray-700 border-gray-600 text-white;
+}
+
+[data-theme='dark'] .btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+}
+
+/* Global Styles */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Card Enhancements */
+.card-enhanced {
+  @apply bg-white rounded-xl shadow-md transition-all duration-300;
+}
+
+.card-enhanced:hover {
+  @apply shadow-lg transform translate-y-[-2px];
+}
+
+/* Button Enhancements */
+.btn-primary {
+  @apply transition-all duration-300;
+}
+
+.btn-primary:hover {
+  @apply shadow-md;
+}
+
+/* Form Enhancements */
+.input-enhanced, .select-enhanced, .textarea-enhanced {
+  @apply border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 transition-all duration-300;
+}
+
+/* Table Enhancements */
+.table-enhanced {
+  @apply rounded-xl overflow-hidden;
+}
+
+.table-enhanced thead tr {
+  @apply bg-primary bg-opacity-10;
+}
+
+.table-enhanced tbody tr:hover {
+  @apply bg-primary bg-opacity-5;
+}
+
+/* Responsive Table Styles */
+.responsive-table {
+  @apply w-full border-collapse;
+}
+
+.responsive-table thead {
+  @apply bg-gray-50 dark:bg-gray-700/50;
+}
+
+.responsive-table tbody {
+  @apply divide-y divide-gray-200 dark:divide-gray-700;
+}
+
+.responsive-table th {
+  @apply px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider;
+}
+
+.responsive-table td {
+  @apply px-6 py-4 text-sm text-gray-700 dark:text-gray-300;
+}
+
+.responsive-table thead tr {
+  @apply border-b border-gray-200 dark:border-gray-700;
+}
+
+.responsive-table tbody tr {
+  @apply hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200;
+}
+
+.responsive-table tbody tr:last-child {
+  @apply border-b-0;
+}
+
+/* Improved spacing for table cells with badges and buttons */
+.responsive-table td .flex {
+  @apply gap-3;
+}
+
+.responsive-table td .inline-flex {
+  @apply min-w-[80px] justify-center;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.7);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(75, 85, 99, 0.5);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(75, 85, 99, 0.7);
+}
+
+/* Status Indicators */
+.status-badge {
+  @apply px-3 py-1 rounded-full text-xs font-medium;
+}
+
+.status-draft {
+  @apply bg-gray-200 text-gray-800;
+}
+
+.status-pending {
+  @apply bg-yellow-200 text-yellow-800;
+}
+
+.status-approved {
+  @apply bg-green-200 text-green-800;
+}
+
+.status-rejected {
+  @apply bg-red-200 text-red-800;
+}
+
+/* Dashboard Stats Enhancement */
+.stats-card {
+  @apply bg-white rounded-xl shadow-md p-6 transition-all duration-300;
+}
+
+.stats-card:hover {
+  @apply shadow-lg transform translate-y-[-2px];
+}
+
+.stat-title {
+  @apply text-gray-600 text-sm font-medium;
+}
+
+.stat-value {
+  @apply text-3xl font-bold text-primary mt-2;
+}
+
+/* Sidebar Enhancement */
+.sidebar-link {
+  @apply flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200;
+}
+
+.sidebar-link.active {
+  @apply bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-medium;
+}
+
+.sidebar-link i {
+  @apply flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-blue-400 transition-all duration-200;
+}
+
+.sidebar-link.active i {
+  @apply bg-blue-500 dark:bg-blue-600 text-white;
+}
+
+.sidebar-link:hover i {
+  @apply bg-blue-500 dark:bg-blue-600 text-white transform -translate-y-1;
+}
+
+/* Navbar Styles */
+.navbar {
+    @apply bg-white dark:bg-gray-800 shadow-md transition-all duration-300;
+}
+
+.navbar-content {
+    @apply flex items-center justify-between px-4 py-2;
+}
+
+.theme-dropdown {
+    @apply dropdown-content z-[1] menu p-2 shadow-lg bg-white dark:bg-gray-700 rounded-box w-52 mt-2;
+}
+
+.theme-btn {
+    @apply flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 w-full text-left;
+}
+
+.theme-btn-light {
+    @apply bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-600;
+}
+
+.theme-btn-dark {
+    @apply bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-600;
+}
+
+.theme-toggle-icon {
+    @apply transition-all duration-300 transform;
+}
+
+.dropdown-menu {
+    @apply dropdown-content z-[1] menu p-2 shadow-lg bg-white dark:bg-gray-700 rounded-box w-52 mt-2;
+}
+
+.dropdown-item {
+    @apply px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md transition-all duration-200 flex items-center gap-2;
+}
+
+/* Improved Dark Mode */
+.dark body {
+    @apply bg-gray-900 text-gray-100;
+}
+
+.dark .card {
+    @apply bg-gray-800 border-gray-700 shadow-lg shadow-gray-900/20;
+}
+
+.dark .input, .dark .select, .dark .textarea {
+    @apply bg-gray-700 border-gray-600 text-white placeholder-gray-400;
+}
+
+.dark .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700;
+}
+
+.dark .table {
+    @apply bg-gray-800 text-gray-200;
+}
+
+.dark .table th {
+    @apply bg-gray-700 text-gray-300;
+}
+
+.dark .table tr:hover {
+    @apply bg-gray-700;
+}
+
+.dark .pagination-link {
+    @apply bg-gray-700 border-gray-600 text-gray-300;
+}
+
+.dark .pagination-link.active {
+    @apply bg-blue-600 border-blue-700 text-white;
+}
+
+/* Improved Transitions */
+.transition-theme {
+    @apply transition-all duration-300 ease-in-out;
+}
+
+/* Animation Utilities */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .stat-value {
+    @apply text-2xl;
+  }
+  
+  .responsive-table th,
+  .responsive-table td {
+    @apply px-3 py-3;
+  }
+  
+  .responsive-table td .inline-flex {
+    @apply min-w-[70px];
+  }
+} 
