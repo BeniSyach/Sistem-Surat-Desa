@@ -37,23 +37,24 @@ class DashboardController extends Controller
             ->count();
         
         if ($user->hasRole('Kasi')) {
-            $data['draft_letters'] = OutgoingLetter::where('created_by', $user->id)
-                ->where('status', OutgoingLetter::STATUS_DRAFT)
+            $data['draft_letters'] = IncomingLetter::where('created_by', $user->id)
+                ->whereIn('status', [OutgoingLetter::STATUS_DRAFT])
                 ->count();
-            $data['rejected_letters'] = OutgoingLetter::whereIn('status', [
+            $data['rejected_letters'] = IncomingLetter::whereIn('status', [
                     OutgoingLetter::STATUS_REJECTED_SEKDES,
-                    OutgoingLetter::STATUS_REJECTED_KADES
+                    OutgoingLetter::STATUS_REJECTED_KADES,
+                    'rejected'
                 ])
                 ->where('created_by', $user->id)
                 ->count();
         } elseif ($user->hasRole('Sekdes')) {
-            $data['pending_approval'] = OutgoingLetter::where('status', OutgoingLetter::STATUS_PENDING_SEKDES)
+            $data['pending_approval'] = IncomingLetter::where('status', OutgoingLetter::STATUS_PENDING_SEKDES)
                 ->count();
         } elseif ($user->hasRole('Kades')) {
-            $data['pending_approval'] = OutgoingLetter::where('status', OutgoingLetter::STATUS_PENDING_KADES)
+            $data['pending_approval'] = IncomingLetter::where('status', OutgoingLetter::STATUS_PENDING_KADES)
                 ->count();
         } elseif ($user->hasRole('Umum')) {
-            $data['pending_numbering'] = OutgoingLetter::where('status', OutgoingLetter::STATUS_PENDING_PROCESS)
+            $data['pending_numbering'] = IncomingLetter::where('status', OutgoingLetter::STATUS_PENDING_PROCESS)
                 ->count();
         }
         

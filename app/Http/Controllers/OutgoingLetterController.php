@@ -135,7 +135,7 @@ class OutgoingLetterController extends Controller
                 'receiver_village_id' => $recipient->village_id,
                 'receiver_user_id' => $recipient->id,
                 'related_outgoing_letter_id' => $letter->id,
-                'status' => 'pending_approval',
+                'status' => 'draft',
             ]);
 
             $incomingLetter->save();

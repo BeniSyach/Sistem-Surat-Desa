@@ -136,12 +136,17 @@ class OutgoingLetter extends Model
         $this->submitted_at = now();
         $this->save();
 
+        $existingIncomingLetter = IncomingLetter::where('related_outgoing_letter_id', $this->id)->first();
+        $existingIncomingLetter->status = 'pending_approval';
+
+        $existingIncomingLetter->save();
+
         // Get Sekdes user from the same village
         $sekdes = User::whereHas('role', function($query) {
                 $query->where('name', 'Sekdes');
             })
             ->where('village_id', $this->village_id)
-            ->where('is_active', true)
+            ->where('is_active', 1)
             ->first();
 
         if ($sekdes) {

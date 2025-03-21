@@ -23,6 +23,10 @@ class IncomingLetterController extends Controller
         $query = IncomingLetter::with(['classification'])
             ->byVillage(auth()->user()->village_id)->where('receiver_user_id', auth()->id());
 
+            if (auth()->user()->isSekdes()) {
+                $query->where('status', '!=', 'draft');
+            }
+
         // Filter berdasarkan tanggal
         if ($request->filled(['start_date', 'end_date'])) {
             $query->byDateRange($request->start_date, $request->end_date);
@@ -463,12 +467,12 @@ class IncomingLetterController extends Controller
 
         // Validate the request
         $request->validate([
-            'rejection_reason' => 'required|string',
+            'approval_notes' => 'required|string',
         ]);
 
         // Update the letter status
         $incomingLetter->status = 'rejected';
-        $incomingLetter->rejection_reason = $request->rejection_reason;
+        $incomingLetter->approval_notes = $request->approval_notes;
         $incomingLetter->save();
 
         // Get the original sender (creator) of the letter
@@ -481,18 +485,18 @@ class IncomingLetterController extends Controller
                 'letter_date' => now(),
                 'received_date' => now(),
                 'sender' => auth()->user()->name . ' (Sekdes)',
-                'subject' => 'Penolakan: ' . $incomingLetter->subject,
+                'subject' => 'Penolakan: ' . $incomingLetter->subject. ' Dengan Alasan'.$request->approval_notes,
                 'description' => $incomingLetter->description,
                 'classification_id' => $incomingLetter->classification_id,
                 'confidentiality' => $incomingLetter->confidentiality,
                 'attachment' => $incomingLetter->attachment,
-                'notes' => 'Surat ditolak dengan alasan: ' . $request->rejection_reason,
+                'notes' => 'Surat ditolak dengan alasan: ' . $request->approval_notes,
                 'created_by' => auth()->id(),
                 'village_id' => $sender->village_id,
                 'sender_village_id' => auth()->user()->village_id,
                 'receiver_village_id' => $sender->village_id,
                 'receiver_user_id' => $sender->id,
-                'status' => 'received',
+                'status' => 'rejected',
                 'related_incoming_letter_id' => $incomingLetter->id,
             ]);
             $rejectionLetter->save();
@@ -616,7 +620,7 @@ class IncomingLetterController extends Controller
                 'confidentiality' => $incomingLetter->confidentiality,
                 'attachment' => $incomingLetter->attachment,
                 'notes' => $validated['approval_notes'] ?? 'Diteruskan dari ' . (auth()->user()->isKades() ? 'Kades' : 'Sekdes'),
-                'created_by' => auth()->id(),
+                'created_by' => $incomingLetter->created_by,
                 'village_id' => $toUser->village_id,
                 'sender_village_id' => auth()->user()->village_id,
                 'receiver_village_id' => $toUser->village_id,
@@ -624,6 +628,7 @@ class IncomingLetterController extends Controller
                 'status' => $status,
                 'related_incoming_letter_id' => $incomingLetter->id,
                 'related_outgoing_letter_id' => $outgoingLetter->id,
+                'sekdes_id' =>  auth()->id(),
             ]);
             
             // If the sender is Kades, add the signature information
@@ -852,5 +857,48 @@ class IncomingLetterController extends Controller
             $kades->signature, 
             'tanda-tangan-kades-' . $incomingLetter->id . '.png'
         );
+    }
+
+    public function kadesReject(Request $request, IncomingLetter $incomingLetter)
+    {
+         // Validate the request
+         $request->validate([
+            'approval_notes' => 'required|string',
+        ]);
+
+        // Update the letter status
+        $incomingLetter->status = 'rejected';
+        $incomingLetter->approval_notes = $request->approval_notes;
+        $incomingLetter->save();
+
+        // Get the original sender (creator) of the letter
+        $sender = User::find($incomingLetter->created_by);
+        
+        if ($sender) {
+            // Create a new incoming letter for the sender to notify about rejection
+            $rejectionLetter = new IncomingLetter([
+                'letter_number' => 'Rejected-' . $incomingLetter->id,
+                'letter_date' => now(),
+                'received_date' => now(),
+                'sender' => auth()->user()->name . ' (Sekdes)',
+                'subject' => 'Penolakan: ' . $incomingLetter->subject. ' Dengan Alasan'.$request->approval_notes,
+                'description' => $incomingLetter->description,
+                'classification_id' => $incomingLetter->classification_id,
+                'confidentiality' => $incomingLetter->confidentiality,
+                'attachment' => $incomingLetter->attachment,
+                'notes' => 'Surat ditolak dengan alasan: ' . $request->approval_notes,
+                'created_by' => auth()->id(),
+                'village_id' => $sender->village_id,
+                'sender_village_id' => auth()->user()->village_id,
+                'receiver_village_id' => $sender->village_id,
+                'receiver_user_id' => $sender->id,
+                'status' => 'rejected',
+                'related_incoming_letter_id' => $incomingLetter->id,
+            ]);
+            $rejectionLetter->save();
+        }
+
+        return redirect()->route('incoming-letters.show', $incomingLetter)
+            ->with('success', 'Surat berhasil ditolak dan pengirim telah diberitahu.');
     }
 }
