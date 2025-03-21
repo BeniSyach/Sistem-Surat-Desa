@@ -3,7 +3,7 @@
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Data Instansi</h1>
             <a href="{{ route('villages.create') }}" class="btn btn-primary flex items-center gap-2">
-                <i class="fas fa-plus"></i> Tambah Desa
+                <i class="fas fa-plus"></i> Tambah Instansi
             </a>
         </div>
 

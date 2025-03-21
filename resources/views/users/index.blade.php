@@ -22,7 +22,7 @@
                     <x-table-header>Nama</x-table-header>
                     <x-table-header class="hidden md:table-cell">Email</x-table-header>
                     <x-table-header>Role</x-table-header>
-                    <x-table-header class="hidden md:table-cell">Desa</x-table-header>
+                    <x-table-header class="hidden md:table-cell">Instansi</x-table-header>
                     <x-table-header>Status</x-table-header>
                     <x-table-header>Aksi</x-table-header>
                 </tr>
