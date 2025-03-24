@@ -146,22 +146,22 @@ class User extends Authenticatable
 
     public function isKasi(): bool
     {
-        return $this->role->name === 'Kasi';
+        return $this->role->name === 'Pembuat Surat';
     }
 
     public function isSekdes(): bool
     {
-        return $this->role->name === 'Sekdes';
+        return $this->role->name === 'Memparaf Surat';
     }
 
     public function isKades(): bool
     {
-        return $this->role->name === 'Kades';
+        return $this->role->name === 'Menandatangani Surat';
     }
 
     public function isUmumDesa()
     {
-        return $this->role->name === 'Umum Desa';
+        return $this->role->name === 'Bagian Umum';
     }
 
     public function isAdmin(): bool

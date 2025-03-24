@@ -11,10 +11,10 @@ class RoleSeeder extends Seeder
     {
         Role::insert([
             ['name' => 'Admin', 'description' => 'Dapat Mengkases Semua fitur'],
-            ['name' => 'Kades', 'description' => 'Tanda tangan surat'],
-            ['name' => 'Sekdes', 'description' => 'Paraf surat'],
-            ['name' => 'Kasi', 'description' => 'Pembuat surat'],
-            ['name' => 'Umum Desa', 'description' => 'Menomori, meletakkan TTD, dan barcode'],
+            ['name' => 'Menandatangani Surat', 'description' => 'Tanda tangan surat'],
+            ['name' => 'Memparaf Surat', 'description' => 'Paraf surat'],
+            ['name' => 'Pembuat Surat', 'description' => 'Pembuat surat'],
+            ['name' => 'Bagian Umum', 'description' => 'Menomori, meletakkan TTD, dan barcode'],
         ]);
     }
 } 

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Login - {{ config('app.name', 'Sistem Surat Desa') }}</title>
+    <title>Login - {{ config('app.name', 'Super Suket') }}</title>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -53,8 +53,8 @@
                     <i class="fas fa-envelope-open-text text-white text-4xl"></i>
                 </div>
             </div>
-            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Sistem Surat Desa</h1>
-            <p class="text-gray-600 dark:text-gray-300 mt-2">Manajemen Surat Masuk dan Keluar Desa</p>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Super Suket</h1>
+            <p class="text-gray-600 dark:text-gray-300 mt-2">Surat Pernyataan dan Surat Keterangan</p>
         </div>
 
         <div
@@ -128,7 +128,7 @@
         </div>
 
         <div class="mt-8 text-center text-gray-600 dark:text-gray-300 text-sm fade-in">
-            &copy; {{ date('Y') }} Sistem Surat Desa. All rights reserved.
+            &copy; {{ date('Y') }} Super Suket. All rights reserved.
         </div>
     </div>
 

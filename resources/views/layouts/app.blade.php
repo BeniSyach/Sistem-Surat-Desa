@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Sistem Surat Desa') }}</title>
+    <title>{{ config('app.name', 'Super Suket') }}</title>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -80,7 +80,7 @@
                     </label>
                 </div>
                 <div class="flex-1">
-                    <span class="text-xl font-bold text-primary">{{ config('app.name', 'Sistem Surat Desa') }}</span>
+                    <span class="text-xl font-bold text-primary">{{ config('app.name', 'Super Suket') }}</span>
                 </div>
                 <div class="flex-none flex items-center gap-2">
                     <!-- Theme Toggle Button -->
@@ -169,7 +169,7 @@
                         </div>
                     </div>
                     <div class="text-center">
-                        <h1 class="text-xl font-bold text-primary dark:text-blue-400">Sistem Surat Desa</h1>
+                        <h1 class="text-xl font-bold text-primary dark:text-blue-400">Super Suket</h1>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manajemen Surat Desa</p>
                     </div>
                 </div>
