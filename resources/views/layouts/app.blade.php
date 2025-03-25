@@ -170,7 +170,7 @@
                     </div>
                     <div class="text-center">
                         <h1 class="text-xl font-bold text-primary dark:text-blue-400">Super Suket</h1>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manajemen Surat Desa</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Surat Pernyataan dan Surat Keterangan</p>
                     </div>
                 </div>
 

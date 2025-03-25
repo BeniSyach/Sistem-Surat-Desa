@@ -193,7 +193,7 @@
                                             <div class="flex flex-col items-center gap-2 bg-base-200 rounded-lg p-4">
                                                 <div class="alert alert-warning">
                                                     <i class="fas fa-exclamation-triangle"></i>
-                                                    <span>Tanda tangan Kades belum tersedia. Silakan upload tanda tangan
+                                                    <span>Tanda tangan belum tersedia. Silakan upload tanda tangan
                                                         terlebih dahulu.</span>
                                                 </div>
                                                 <a href="{{ route('users.signature', $incomingLetter->kades->id) }}"

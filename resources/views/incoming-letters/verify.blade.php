@@ -92,7 +92,7 @@
                                     <th>Status</th>
                                     <td>
                                         @if ($incomingLetter->status === 'processed')
-                                            <span class="badge badge-success">Diproses</span>
+                                            <span class="badge badge-success">Selesai</span>
                                         @elseif ($incomingLetter->status === 'finish')
                                             <span class="badge badge-success">Selesai</span>
                                         @endif
