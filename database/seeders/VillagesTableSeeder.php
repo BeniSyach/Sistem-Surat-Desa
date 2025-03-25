@@ -18,7 +18,7 @@ class VillagesTableSeeder extends Seeder
                 'name' => 'Kecamatan Sei Rampah',
                 'address' => 'Kecamatan Sei Rampah, Kabupaten Serdang Bedagai',
                 'phone' => '0',
-                'email' => 'desa.pergulaan@gmail.com',
+                'email' => 'kecamatan.seirampah@gmail.com',
                 'village_head' => '-',
                 'logo' => null,
                 'created_at' => now(),
