@@ -155,55 +155,29 @@ class OutgoingLetterApprovalController extends Controller
     /**
      * Process letter as Umum Desa.
      */
-    public function umumProcess(Request $request, OutgoingLetter $outgoingLetter)
+    public function umumProcess(OutgoingLetter $letter)
     {
-        $this->authorize('process', $outgoingLetter);
+        $user = auth()->user();
+        $village = $user->village;
 
-        // Check if Kades has signature
-        $kades = User::whereHas('role', function($query) {
-            $query->where('name', 'Kades');
-        })
-        ->where('village_id', auth()->user()->village_id)
-        ->where('is_active', true)
-        ->first();
-
-        if (!$kades || !$kades->signature) {
-            return redirect()
-                ->route('users.signature', $kades)
-                ->with('error', 'Kades belum memiliki tanda tangan. Silakan tambahkan tanda tangan Kades terlebih dahulu.');
+        if (!$village) {
+            return redirect()->back()->with('error', 'Anda belum terdaftar di instansi manapun.');
         }
 
-        $validated = $request->validate([
-            'letter_number' => 'required|string|max:255|unique:outgoing_letters,letter_number,' . $outgoingLetter->id,
-        ]);
+        $kadesUser = User::whereHas('role', function ($query) {
+            $query->where('name', 'Menandatangani Surat');
+        })->where('village_id', $village->id)->first();
+
+        if (!$kadesUser || !$kadesUser->signature) {
+            return redirect()->back()
+                ->with('error', 'Kepala Desa belum memiliki tanda tangan. Silakan tambahkan tanda tangan Kepala Desa terlebih dahulu.');
+        }
 
         try {
-            DB::beginTransaction();
-            
-            $outgoingLetter->process(auth()->user(), $validated['letter_number']);
-            
-            // Update the corresponding incoming letter with the letter number
-            $incomingLetter = IncomingLetter::where('subject', $outgoingLetter->subject)
-                ->where('created_by', $outgoingLetter->created_by)
-                ->where('letter_date', $outgoingLetter->letter_date)
-                ->first();
-
-            if ($incomingLetter) {
-                $incomingLetter->letter_number = $validated['letter_number'];
-                $incomingLetter->save();
-            }
-            
-            DB::commit();
-
-            return redirect()
-                ->route('outgoing-letters.show', $outgoingLetter)
-                ->with('success', 'Surat keluar berhasil diproses dan diberi nomor surat.');
+            $letter->process($user);
+            return redirect()->back()->with('success', 'Surat berhasil diproses.');
         } catch (\Exception $e) {
-            DB::rollback();
-            
-            return redirect()
-                ->back()
-                ->with('error', 'Terjadi kesalahan saat memproses surat: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memproses surat. ' . $e->getMessage());
         }
     }
 }

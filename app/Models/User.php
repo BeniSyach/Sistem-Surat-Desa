@@ -159,7 +159,7 @@ class User extends Authenticatable
         return $this->role->name === 'Menandatangani Surat';
     }
 
-    public function isUmumDesa()
+    public function isUmumDesa(): bool
     {
         return $this->role->name === 'Bagian Umum';
     }

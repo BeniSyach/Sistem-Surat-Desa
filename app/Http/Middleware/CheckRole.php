@@ -13,22 +13,18 @@ class CheckRole
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, ...$roles): Response
+    public function handle($request, Closure $next, ...$roles)
     {
         if (!$request->user() || !$request->user()->role) {
-            return redirect()->route('login');
+            return redirect('/');
         }
 
-        $userRole = $request->user()->role->name;
-
-        if (in_array('Admin', $roles) && $request->user()->isAdmin()) {
-            return $next($request);
+        foreach ($roles as $role) {
+            if ($request->user()->role->name === $role) {
+                return $next($request);
+            }
         }
 
-        if (!in_array($userRole, $roles)) {
-            return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses ke halaman tersebut.');
-        }
-
-        return $next($request);
+        return redirect('/');
     }
 }

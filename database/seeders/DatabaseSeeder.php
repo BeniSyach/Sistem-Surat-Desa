@@ -20,8 +20,10 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
+            VillagesTableSeeder::class,
             RoleSeeder::class,
             AdminSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

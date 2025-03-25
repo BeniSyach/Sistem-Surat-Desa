@@ -36,7 +36,7 @@ class DashboardController extends Controller
             ->whereNull('read_at')
             ->count();
         
-        if ($user->hasRole('Kasi')) {
+        if ($user->role->name === 'Pembuat Surat') {
             $data['draft_letters'] = IncomingLetter::where('created_by', $user->id)
                 ->whereIn('status', [OutgoingLetter::STATUS_DRAFT])
                 ->count();
@@ -47,13 +47,13 @@ class DashboardController extends Controller
                 ])
                 ->where('created_by', $user->id)
                 ->count();
-        } elseif ($user->hasRole('Sekdes')) {
+        } elseif ($user->role->name === 'Memparaf Surat') {
             $data['pending_approval'] = IncomingLetter::where('status', OutgoingLetter::STATUS_PENDING_SEKDES)
                 ->count();
-        } elseif ($user->hasRole('Kades')) {
+        } elseif ($user->role->name === 'Menandatangani Surat') {
             $data['pending_approval'] = IncomingLetter::where('status', OutgoingLetter::STATUS_PENDING_KADES)
                 ->count();
-        } elseif ($user->hasRole('Umum')) {
+        } elseif ($user->role->name === 'Bagian Umum') {
             $data['pending_numbering'] = IncomingLetter::where('status', OutgoingLetter::STATUS_PENDING_PROCESS)
                 ->count();
         }

@@ -101,19 +101,46 @@
                             </div>
                         @endif
 
-                        @if ($incomingLetter->attachment)
+                        @if ($incomingLetter->letter_file && $incomingLetter->status != 'processed')
                             <div>
                                 <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
                                     <i class="fas fa-paperclip text-warning"></i>
                                     File Surat
                                 </h3>
-                                <a href="{{ route('incoming-letters.download-attachment', $incomingLetter) }}"
-                                    class="btn btn-primary btn-sm gap-2">
-                                    <i class="fas fa-download"></i>
-                                    Unduh Lampiran
-                                </a>
+                                <div class="flex gap-2">
+                                    <a href="{{ route('incoming-letters.download-final', $incomingLetter) }}"
+                                        class="btn btn-primary btn-sm gap-2">
+                                        <i class="fas fa-download"></i>
+                                        Unduh Surat
+                                    </a>
+                                </div>
                             </div>
                         @endif
+
+                        @if ($incomingLetter->attachment)
+                            <div>
+                                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                                    <i class="fas fa-paperclip text-warning"></i>
+                                    File Lampiran
+                                </h3>
+                                <div class="flex gap-2">
+                                    <a href="{{ route('incoming-letters.download-attachment', $incomingLetter) }}"
+                                        class="btn btn-primary btn-sm gap-2">
+                                        <i class="fas fa-download"></i>
+                                        Unduh Lampiran
+                                    </a>
+                                    @if ($incomingLetter->final_letter_number)
+                                        <a href="{{ route('incoming-letters.download-final', $incomingLetter) }}"
+                                            class="btn btn-success btn-sm gap-2">
+                                            <i class="fas fa-file-pdf"></i>
+                                            Unduh Surat Final
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+
+
 
                         @if (auth()->user()->isUmumDesa() && ($incomingLetter->status === 'signed' || $incomingLetter->status === 'processed'))
                             <div>

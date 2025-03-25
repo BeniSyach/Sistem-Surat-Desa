@@ -238,7 +238,7 @@
                     </div>
                 @endif
 
-                @if (auth()->user()->isKades() && $incomingLetter->status === 'approved')
+                @if (auth()->user()->role->name === 'Menandatangani Surat' && $incomingLetter->status === 'approved')
                     <div class="bg-base-100 rounded-xl shadow-md p-6 space-y-4">
                         <h3 class="text-lg font-semibold flex items-center gap-2">
                             <i class="fas fa-share text-warning"></i>
@@ -267,11 +267,11 @@
                                 <label class="label">
                                     <span class="label-text">Catatan Disposisi</span>
                                 </label>
-                                <textarea name="notes" class="textarea textarea-bordered" placeholder="Tambahkan catatan disposisi..." required></textarea>
+                                <textarea name="notes" class="textarea textarea-bordered" placeholder="Tambahkan catatan disposisi..."></textarea>
                             </div>
-                            <button type="submit" class="btn btn-info w-full gap-2">
+                            <button type="submit" class="btn btn-warning w-full">
                                 <i class="fas fa-share"></i>
-                                Teruskan Surat
+                                Buat Disposisi
                             </button>
                         </form>
                     </div>

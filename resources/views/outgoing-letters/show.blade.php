@@ -36,8 +36,6 @@
             </div>
         </div>
 
-
-
         @if (session('error'))
             <div class="alert alert-error mb-6">
                 <i class="fas fa-exclamation-circle"></i>
@@ -56,9 +54,9 @@
                     <h3 class="font-bold">Surat Ditolak</h3>
                     <div class="text-sm">
                         @if ($letter->status === 'rejected_sekdes')
-                            Surat ini ditolak oleh Sekdes.
+                            Surat ini ditolak oleh Sekretaris Desa.
                         @else
-                            Surat ini ditolak oleh Kades.
+                            Surat ini ditolak oleh Kepala Desa.
                         @endif
                         <p class="mt-1">Alasan: {{ $letter->rejection_reason }}</p>
                     </div>
@@ -92,6 +90,42 @@
                                     <span>{{ $letter->department->name }}</span>
                                 </div>
                             </div>
+
+                            <div class="mt-4 space-y-2">
+                                @if ($letter->letter_file)
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-file-alt text-blue-500"></i>
+                                        <a href="{{ route('outgoing-letters.download-letter-file', $letter) }}"
+                                            class="text-blue-500 hover:text-blue-600">
+                                            Download File Surat
+                                        </a>
+                                    </div>
+                                @endif
+
+                                @if ($letter->attachment)
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-paperclip text-blue-500"></i>
+                                        @php
+                                            $attachments = json_decode($letter->attachment, true);
+                                        @endphp
+                                        @if (is_array($attachments))
+                                            <div class="space-y-1">
+                                                @foreach ($attachments as $index => $path)
+                                                    <a href="{{ route('outgoing-letters.download-attachment', ['outgoingLetter' => $letter, 'index' => $index]) }}"
+                                                        class="block text-blue-500 hover:text-blue-600">
+                                                        Download Lampiran {{ $index + 1 }}
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <a href="{{ route('outgoing-letters.download-attachment', $letter) }}"
+                                                class="text-blue-500 hover:text-blue-600">
+                                                Download Lampiran
+                                            </a>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
                         </div>
 
                         @if ($letter->letter_number)
@@ -112,21 +146,6 @@
                             </div>
                         </div>
 
-                        @if ($letter->attachment)
-                            <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                <div class="flex-1">
-                                    <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">File Lampiran
-                                    </h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                                        {{ basename($letter->attachment) }}</p>
-                                </div>
-                                <a href="{{ route('outgoing-letters.download-attachment', $letter) }}"
-                                    class="btn btn-primary btn-sm flex items-center gap-2">
-                                    <i class="fas fa-download"></i> Download
-                                </a>
-                            </div>
-                        @endif
-
                         @if ($letter->isProcessed())
                             <div class="border rounded p-4 mb-6">
                                 <h3 class="font-bold mb-2">Verifikasi</h3>
@@ -146,9 +165,9 @@
                                     <div class="mt-4 text-center">
                                         <p class="text-sm text-gray-600 mb-2">Ditandatangani oleh:</p>
                                         <img src="{{ Storage::url($letter->kades->signature) }}"
-                                            alt="Tanda Tangan Kades" class="mx-auto h-24 object-contain mb-1">
+                                            alt="Tanda Tangan Kepala Desa" class="mx-auto h-24 object-contain mb-1">
                                         <p class="font-bold">{{ $letter->kades->name }}</p>
-                                        <p class="text-sm text-gray-600">Kepala Instansi</p>
+                                        <p class="text-sm text-gray-600">Kepala Desa</p>
                                     </div>
                                 @endif
                             </div>
@@ -276,6 +295,123 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- File Surat -->
+        <div class="bg-base-100 rounded-xl shadow-md p-6 space-y-4">
+            <h3 class="text-lg font-semibold flex items-center gap-2">
+                <i class="fas fa-file-alt text-primary"></i>
+                File Surat
+            </h3>
+            @if ($letter->letter_file)
+                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <i class="fas fa-file-alt text-primary text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900 dark:text-white">File Surat</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ pathinfo($letter->letter_file, PATHINFO_FILENAME) }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        @if (auth()->user()->isKasi() && $letter->status === 'draft')
+                            <a href="{{ route('outgoing-letters.edit', $letter) }}"
+                                class="btn btn-warning btn-sm gap-2">
+                                <i class="fas fa-edit"></i>
+                                Edit
+                            </a>
+                        @endif
+                        <a href="{{ route('outgoing-letters.download-letter-file', $letter) }}"
+                            class="btn btn-primary btn-sm gap-2">
+                            <i class="fas fa-download"></i>
+                            Download
+                        </a>
+                    </div>
+                </div>
+            @else
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>File surat belum diupload</span>
+                </div>
+            @endif
+        </div>
+
+        <!-- Lampiran -->
+        <div class="bg-base-100 rounded-xl shadow-md p-6 space-y-4">
+            <h3 class="text-lg font-semibold flex items-center gap-2">
+                <i class="fas fa-paperclip text-primary"></i>
+                Lampiran
+            </h3>
+            @if ($letter->attachment)
+                @if (is_array($letter->attachment))
+                    @foreach ($letter->attachment as $index => $attachment)
+                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                                    <i class="fas fa-paperclip text-primary text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900 dark:text-white">Lampiran {{ $index + 1 }}
+                                    </p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ pathinfo($attachment, PATHINFO_FILENAME) }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                @if (auth()->user()->isKasi() && $letter->status === 'draft')
+                                    <a href="{{ route('outgoing-letters.edit', $letter) }}"
+                                        class="btn btn-warning btn-sm gap-2">
+                                        <i class="fas fa-edit"></i>
+                                        Edit
+                                    </a>
+                                @endif
+                                <a href="{{ route('outgoing-letters.download-attachment', ['outgoingLetter' => $letter, 'attachment' => $attachment]) }}"
+                                    class="btn btn-primary btn-sm gap-2">
+                                    <i class="fas fa-download"></i>
+                                    Download
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <i class="fas fa-paperclip text-primary text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Lampiran</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ pathinfo($letter->attachment, PATHINFO_FILENAME) }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            @if (auth()->user()->isKasi() && $letter->status === 'draft')
+                                <a href="{{ route('outgoing-letters.edit', $letter) }}"
+                                    class="btn btn-warning btn-sm gap-2">
+                                    <i class="fas fa-edit"></i>
+                                    Edit
+                                </a>
+                            @endif
+                            <a href="{{ route('outgoing-letters.download-attachment', ['outgoingLetter' => $letter, 'attachment' => $letter->attachment]) }}"
+                                class="btn btn-primary btn-sm gap-2">
+                                <i class="fas fa-download"></i>
+                                Download
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            @else
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Tidak ada lampiran</span>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

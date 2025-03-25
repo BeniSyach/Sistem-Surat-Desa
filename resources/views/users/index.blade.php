@@ -72,7 +72,7 @@
                                     class="inline-flex items-center px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-md hover:bg-purple-200 dark:hover:bg-purple-800/30 transition-colors duration-200">
                                     <i class="fas fa-signature mr-1"></i> TTD
                                 </a>
-                                @if (!$user->isAdmin())
+                                @if (!$user->role->name === 'Admin')
                                     @if ($user->is_active)
                                         <form action="{{ route('users.deactivate', $user) }}" method="POST"
                                             onsubmit="return confirm('Apakah Anda yakin ingin menonaktifkan pengguna ini?')">

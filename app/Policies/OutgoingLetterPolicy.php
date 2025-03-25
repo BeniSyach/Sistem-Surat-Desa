@@ -74,7 +74,7 @@ class OutgoingLetterPolicy
     public function approveSekdes(User $user, OutgoingLetter $outgoingLetter): bool
     {
         // Hanya Sekdes yang bisa menyetujui surat yang menunggu persetujuan Sekdes
-        return $user->role->name === 'Sekdes' &&
+        return $user->role->name === 'Memparaf Surat' &&
             $user->village_id === $outgoingLetter->village_id &&
             $outgoingLetter->canBeApprovedBySekdes();
     }
@@ -85,7 +85,7 @@ class OutgoingLetterPolicy
     public function approveKades(User $user, OutgoingLetter $outgoingLetter): bool
     {
         // Hanya Kades yang bisa menyetujui surat yang menunggu persetujuan Kades
-        return $user->role->name === 'Kades' &&
+        return $user->role->name === 'Menandatangani Surat' &&
             $user->village_id === $outgoingLetter->village_id &&
             $outgoingLetter->canBeApprovedByKades();
     }
@@ -96,7 +96,7 @@ class OutgoingLetterPolicy
     public function process(User $user, OutgoingLetter $outgoingLetter): bool
     {
         // Hanya Umum Desa yang bisa memproses surat yang sudah disetujui Kades
-        return $user->role->name === 'Umum Desa' &&
+        return $user->role->name === 'Bagian Umum' &&
             $user->village_id === $outgoingLetter->village_id &&
             $outgoingLetter->canBeProcessed();
     }
@@ -125,7 +125,7 @@ class OutgoingLetterPolicy
     public function createDisposition(User $user, OutgoingLetter $outgoingLetter): bool
     {
         // Only Kades can create dispositions, and only for processed letters
-        return $user->hasRole('Kades') && 
+        return $user->role->name === 'Menandatangani Surat' && 
                $outgoingLetter->status === OutgoingLetter::STATUS_PROCESSED;
     }
 } 

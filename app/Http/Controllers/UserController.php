@@ -152,7 +152,7 @@ class UserController extends Controller
      */
     public function deactivate(User $user)
     {
-        if ($user->isAdmin()) {
+        if ($user->role->name === 'Admin') {
             return redirect()
                 ->route('users.index')
                 ->with('error', 'Admin tidak dapat dinonaktifkan.');

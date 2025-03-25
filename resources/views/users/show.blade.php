@@ -90,11 +90,11 @@
                             <i class="fas fa-clipboard-list text-sm"></i> Aktivitas Surat
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            @if ($user->isKasi())
+                            @if ($user->role->name === 'Menandatangani Surat')
                                 <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                                     <h4
                                         class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1">
-                                        <i class="fas fa-paper-plane text-blue-500"></i> Surat Keluar yang Dibuat
+                                        <i class="fas fa-signature text-blue-500"></i> Surat yang Ditandatangani
                                     </h4>
                                     <div class="overflow-x-auto">
                                         <x-responsive-table>
@@ -102,7 +102,85 @@
                                                 <tr>
                                                     <x-table-header>No</x-table-header>
                                                     <x-table-header>Nomor Surat</x-table-header>
-                                                    <x-table-header>Status</x-table-header>
+                                                    <x-table-header>Tanggal TTD</x-table-header>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse($user->approvedOutgoingLettersAsKades as $letter)
+                                                    <tr class="hover:bg-gray-100 dark:hover:bg-gray-600">
+                                                        <x-table-cell>{{ $loop->iteration }}</x-table-cell>
+                                                        <x-table-cell>
+                                                            <span
+                                                                class="font-medium">{{ $letter->letter_number ?? 'Draft' }}</span>
+                                                        </x-table-cell>
+                                                        <x-table-cell>{{ $letter->kades_approved_at->format('d/m/Y H:i') }}</x-table-cell>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <x-table-cell colspan="3"
+                                                            class="text-center text-gray-500 dark:text-gray-400">
+                                                            Tidak ada surat yang ditandatangani
+                                                        </x-table-cell>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </x-responsive-table>
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if ($user->role->name === 'Memparaf Surat')
+                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                    <h4
+                                        class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1">
+                                        <i class="fas fa-check text-green-500"></i> Surat yang Diparaf
+                                    </h4>
+                                    <div class="overflow-x-auto">
+                                        <x-responsive-table>
+                                            <thead>
+                                                <tr>
+                                                    <x-table-header>No</x-table-header>
+                                                    <x-table-header>Nomor Surat</x-table-header>
+                                                    <x-table-header>Tanggal Paraf</x-table-header>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse($user->approvedOutgoingLettersAsSekdes as $letter)
+                                                    <tr class="hover:bg-gray-100 dark:hover:bg-gray-600">
+                                                        <x-table-cell>{{ $loop->iteration }}</x-table-cell>
+                                                        <x-table-cell>
+                                                            <span
+                                                                class="font-medium">{{ $letter->letter_number ?? 'Draft' }}</span>
+                                                        </x-table-cell>
+                                                        <x-table-cell>{{ $letter->sekdes_approved_at->format('d/m/Y H:i') }}</x-table-cell>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <x-table-cell colspan="3"
+                                                            class="text-center text-gray-500 dark:text-gray-400">
+                                                            Tidak ada surat yang diparaf
+                                                        </x-table-cell>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </x-responsive-table>
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if ($user->role->name === 'Pembuat Surat')
+                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                    <h4
+                                        class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1">
+                                        <i class="fas fa-file-alt text-purple-500"></i> Surat yang Dibuat
+                                    </h4>
+                                    <div class="overflow-x-auto">
+                                        <x-responsive-table>
+                                            <thead>
+                                                <tr>
+                                                    <x-table-header>No</x-table-header>
+                                                    <x-table-header>Nomor Surat</x-table-header>
+                                                    <x-table-header>Tanggal Dibuat</x-table-header>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -113,185 +191,63 @@
                                                             <span
                                                                 class="font-medium">{{ $letter->letter_number ?? 'Draft' }}</span>
                                                         </x-table-cell>
-                                                        <x-table-cell>
-                                                            @switch($letter->status)
-                                                                @case('draft')
-                                                                    <span
-                                                                        class="px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-full text-xs">
-                                                                        Draft
-                                                                    </span>
-                                                                @break
-
-                                                                @case('sekdes_review')
-                                                                    <span
-                                                                        class="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-xs">
-                                                                        Review Sekdes
-                                                                    </span>
-                                                                @break
-
-                                                                @case('kades_review')
-                                                                    <span
-                                                                        class="px-2 py-1 bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 rounded-full text-xs">
-                                                                        Review Kades
-                                                                    </span>
-                                                                @break
-
-                                                                @case('approved')
-                                                                    <span
-                                                                        class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">
-                                                                        Disetujui
-                                                                    </span>
-                                                                @break
-
-                                                                @case('rejected')
-                                                                    <span
-                                                                        class="px-2 py-1 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-full text-xs">
-                                                                        Ditolak
-                                                                    </span>
-                                                                @break
-
-                                                                @default
-                                                                    <span
-                                                                        class="px-2 py-1 bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 rounded-full text-xs">
-                                                                        {{ $letter->status }}
-                                                                    </span>
-                                                            @endswitch
+                                                        <x-table-cell>{{ $letter->created_at->format('d/m/Y H:i') }}</x-table-cell>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <x-table-cell colspan="3"
+                                                            class="text-center text-gray-500 dark:text-gray-400">
+                                                            Tidak ada surat yang dibuat
                                                         </x-table-cell>
                                                     </tr>
-                                                    @empty
-                                                        <tr>
-                                                            <x-table-cell colspan="3"
-                                                                class="text-center text-gray-500 dark:text-gray-400">
-                                                                Tidak ada surat keluar
-                                                            </x-table-cell>
-                                                        </tr>
-                                                    @endforelse
-                                                </tbody>
-                                            </x-responsive-table>
-                                        </div>
+                                                @endforelse
+                                            </tbody>
+                                        </x-responsive-table>
                                     </div>
-                                @endif
+                                </div>
+                            @endif
 
-                                @if ($user->isSekdes())
-                                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                        <h4
-                                            class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1">
-                                            <i class="fas fa-signature text-indigo-500"></i> Surat yang Diparaf
-                                        </h4>
-                                        <div class="overflow-x-auto">
-                                            <x-responsive-table>
-                                                <thead>
-                                                    <tr>
-                                                        <x-table-header>No</x-table-header>
-                                                        <x-table-header>Nomor Surat</x-table-header>
-                                                        <x-table-header>Tanggal Paraf</x-table-header>
+                            @if ($user->role->name === 'Bagian Umum')
+                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                    <h4
+                                        class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1">
+                                        <i class="fas fa-cogs text-purple-500"></i> Surat yang Diproses
+                                    </h4>
+                                    <div class="overflow-x-auto">
+                                        <x-responsive-table>
+                                            <thead>
+                                                <tr>
+                                                    <x-table-header>No</x-table-header>
+                                                    <x-table-header>Nomor Surat</x-table-header>
+                                                    <x-table-header>Tanggal Proses</x-table-header>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse($user->processedOutgoingLetters as $letter)
+                                                    <tr class="hover:bg-gray-100 dark:hover:bg-gray-600">
+                                                        <x-table-cell>{{ $loop->iteration }}</x-table-cell>
+                                                        <x-table-cell>
+                                                            <span
+                                                                class="font-medium">{{ $letter->letter_number ?? 'Draft' }}</span>
+                                                        </x-table-cell>
+                                                        <x-table-cell>{{ $letter->processed_at->format('d/m/Y H:i') }}</x-table-cell>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @forelse($user->approvedOutgoingLettersAsSekdes as $letter)
-                                                        <tr class="hover:bg-gray-100 dark:hover:bg-gray-600">
-                                                            <x-table-cell>{{ $loop->iteration }}</x-table-cell>
-                                                            <x-table-cell>
-                                                                <span
-                                                                    class="font-medium">{{ $letter->letter_number ?? 'Draft' }}</span>
-                                                            </x-table-cell>
-                                                            <x-table-cell>{{ $letter->sekdes_approved_at->format('d/m/Y H:i') }}</x-table-cell>
-                                                        </tr>
-                                                    @empty
-                                                        <tr>
-                                                            <x-table-cell colspan="3"
-                                                                class="text-center text-gray-500 dark:text-gray-400">
-                                                                Tidak ada surat yang diparaf
-                                                            </x-table-cell>
-                                                        </tr>
-                                                    @endforelse
-                                                </tbody>
-                                            </x-responsive-table>
-                                        </div>
-                                    </div>
-                                @endif
-
-                                @if ($user->isKades())
-                                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                        <h4
-                                            class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1">
-                                            <i class="fas fa-file-signature text-green-500"></i> Surat yang Ditandatangani
-                                        </h4>
-                                        <div class="overflow-x-auto">
-                                            <x-responsive-table>
-                                                <thead>
+                                                @empty
                                                     <tr>
-                                                        <x-table-header>No</x-table-header>
-                                                        <x-table-header>Nomor Surat</x-table-header>
-                                                        <x-table-header>Tanggal TTD</x-table-header>
+                                                        <x-table-cell colspan="3"
+                                                            class="text-center text-gray-500 dark:text-gray-400">
+                                                            Tidak ada surat yang diproses
+                                                        </x-table-cell>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @forelse($user->approvedOutgoingLettersAsKades as $letter)
-                                                        <tr class="hover:bg-gray-100 dark:hover:bg-gray-600">
-                                                            <x-table-cell>{{ $loop->iteration }}</x-table-cell>
-                                                            <x-table-cell>
-                                                                <span
-                                                                    class="font-medium">{{ $letter->letter_number ?? 'Draft' }}</span>
-                                                            </x-table-cell>
-                                                            <x-table-cell>{{ $letter->kades_approved_at->format('d/m/Y H:i') }}</x-table-cell>
-                                                        </tr>
-                                                    @empty
-                                                        <tr>
-                                                            <x-table-cell colspan="3"
-                                                                class="text-center text-gray-500 dark:text-gray-400">
-                                                                Tidak ada surat yang ditandatangani
-                                                            </x-table-cell>
-                                                        </tr>
-                                                    @endforelse
-                                                </tbody>
-                                            </x-responsive-table>
-                                        </div>
+                                                @endforelse
+                                            </tbody>
+                                        </x-responsive-table>
                                     </div>
-                                @endif
-
-                                @if ($user->isUmumDesa())
-                                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                        <h4
-                                            class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1">
-                                            <i class="fas fa-cogs text-purple-500"></i> Surat yang Diproses
-                                        </h4>
-                                        <div class="overflow-x-auto">
-                                            <x-responsive-table>
-                                                <thead>
-                                                    <tr>
-                                                        <x-table-header>No</x-table-header>
-                                                        <x-table-header>Nomor Surat</x-table-header>
-                                                        <x-table-header>Tanggal Proses</x-table-header>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @forelse($user->processedOutgoingLetters as $letter)
-                                                        <tr class="hover:bg-gray-100 dark:hover:bg-gray-600">
-                                                            <x-table-cell>{{ $loop->iteration }}</x-table-cell>
-                                                            <x-table-cell>
-                                                                <span
-                                                                    class="font-medium">{{ $letter->letter_number }}</span>
-                                                            </x-table-cell>
-                                                            <x-table-cell>{{ $letter->umum_processed_at->format('d/m/Y H:i') }}</x-table-cell>
-                                                        </tr>
-                                                    @empty
-                                                        <tr>
-                                                            <x-table-cell colspan="3"
-                                                                class="text-center text-gray-500 dark:text-gray-400">
-                                                                Tidak ada surat yang diproses
-                                                            </x-table-cell>
-                                                        </tr>
-                                                    @endforelse
-                                                </tbody>
-                                            </x-responsive-table>
-                                        </div>
-                                    </div>
-                                @endif
-                            </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </x-app-layout>
+</x-app-layout>

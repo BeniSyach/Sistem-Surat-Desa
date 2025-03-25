@@ -185,7 +185,7 @@
                         <span class="ml-3 font-medium text-gray-700 dark:text-gray-200">Dashboard</span>
                     </a>
 
-                    @if (Auth::user()->isAdmin())
+                    @if (Auth::user()->role->name === 'Admin')
                         <div class="divider my-3 text-sm text-gray-500 dark:text-gray-400 font-medium">Master Data</div>
 
                         <a href="{{ route('villages.index') }}"

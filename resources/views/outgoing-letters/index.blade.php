@@ -1,4 +1,5 @@
 <x-app-layout>
+    @section('title', 'Surat Keluar')
     <div class="container mx-auto px-4 py-6">
         <div class="flex items-center justify-between mb-6">
             <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Surat Keluar</h1>
@@ -21,9 +22,9 @@
                             <option value="">Semua Status</option>
                             <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
                             <option value="sekdes_review" {{ request('status') == 'sekdes_review' ? 'selected' : '' }}>
-                                Review Sekdes</option>
+                                Review Sekretaris Desa</option>
                             <option value="kades_review" {{ request('status') == 'kades_review' ? 'selected' : '' }}>
-                                Review Kades</option>
+                                Review Kepala Desa</option>
                             <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Disetujui
                             </option>
                             <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak
@@ -115,14 +116,14 @@
                                 @case('sekdes_review')
                                     <span
                                         class="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-md text-xs font-medium">
-                                        Review Sekdes
+                                        Review Sekretaris Desa
                                     </span>
                                 @break
 
                                 @case('kades_review')
                                     <span
                                         class="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-md text-xs font-medium">
-                                        Review Kades
+                                        Review Kepala Desa
                                     </span>
                                 @break
 

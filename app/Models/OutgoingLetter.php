@@ -16,6 +16,7 @@ class OutgoingLetter extends Model
         'letter_date',
         'subject',
         'content',
+        'letter_file',
         'attachment',
         'classification_id',
         'confidentiality',

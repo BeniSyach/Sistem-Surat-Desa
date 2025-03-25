@@ -50,7 +50,11 @@ class OutgoingLetterController extends Controller
         
         // Get potential signers (Kades and other officials who can sign letters)
         $signers = User::whereHas('role', function($query) {
-                $query->whereIn('name', ['Kades', 'Sekdes', 'Kasi']);
+                $query->whereIn('name', [
+                    'Menandatangani Surat',
+                    'Memparaf Surat',
+                    'Pembuat Surat'
+                ]);
             })
             ->where('is_active', true)
             ->get();
@@ -86,7 +90,8 @@ class OutgoingLetterController extends Controller
             'department_id' => 'required|exists:departments,id',
             'recipient_id' => 'required|exists:users,id',
             'signer_id' => 'required|exists:users,id',
-            'attachment' => 'nullable|file|mimes:pdf|max:2048',
+            'letter_file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx|max:5120', // 5MB max
+            'attachment' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:5120', // 5MB max
         ]);
 
         DB::beginTransaction();
@@ -107,9 +112,16 @@ class OutgoingLetterController extends Controller
                     ->with('error', 'Penandatangan yang dipilih tidak valid atau tidak aktif.');
             }
 
+            // Handle letter file upload
+            if ($request->hasFile('letter_file')) {
+                $letterPath = $request->file('letter_file')->store('letters/outgoing', 'public');
+                $validated['letter_file'] = $letterPath;
+            }
+
+            // Handle single attachment
             if ($request->hasFile('attachment')) {
-                $path = $request->file('attachment')->store('attachments/outgoing', 'public');
-                $validated['attachment'] = $path;
+                $attachmentPath = $request->file('attachment')->store('attachments/outgoing', 'public');
+                $validated['attachment'] = $attachmentPath;
             }
 
             // Create outgoing letter
@@ -120,13 +132,14 @@ class OutgoingLetterController extends Controller
 
             // Buat surat masuk untuk penerima
             $incomingLetter = new IncomingLetter([
-                'letter_number' => 'Draft-' . $letter->id, // Will be updated when the outgoing letter is processed
+                'letter_number' => 'Draft-' . $letter->id,
                 'letter_date' => $validated['letter_date'],
                 'received_date' => now(),
                 'sender' => auth()->user()->name,
                 'subject' => $validated['subject'],
                 'description' => $validated['content'],
                 'classification_id' => $validated['classification_id'],
+                'letter_file' => $validated['letter_file'],
                 'attachment' => $validated['attachment'] ?? null,
                 'notes' => 'Surat ini dibuat oleh ' . auth()->user()->name,
                 'created_by' => auth()->id(),
@@ -182,9 +195,13 @@ class OutgoingLetterController extends Controller
         $classifications = LetterClassification::all();
         $departments = Department::all();
         
-        // Get potential signers (Kades and other officials who can sign letters)
+        // Get potential signers (officials who can sign letters)
         $signers = User::whereHas('role', function($query) {
-                $query->whereIn('name', ['Kades', 'Sekdes', 'Kasi']);
+                $query->whereIn('name', [
+                    'Menandatangani Surat',
+                    'Memparaf Surat',
+                    'Pembuat Surat'
+                ]);
             })
             ->where('village_id', auth()->user()->village_id)
             ->where('is_active', true)
@@ -208,7 +225,8 @@ class OutgoingLetterController extends Controller
             'confidentiality' => 'required|in:biasa,rahasia,umum',
             'department_id' => 'required|exists:departments,id',
             'signer_id' => 'required|exists:users,id',
-            'attachment' => 'nullable|file|mimes:pdf|max:2048',
+            'letter_file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:5120', // 5MB max
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:5120', // 5MB max per file
         ]);
 
         DB::beginTransaction();
@@ -225,58 +243,47 @@ class OutgoingLetterController extends Controller
                     ->with('error', 'Penandatangan yang dipilih tidak valid atau tidak aktif.');
             }
 
-            if ($request->hasFile('attachment')) {
-                if ($outgoingLetter->attachment) {
-                    Storage::disk('public')->delete($outgoingLetter->attachment);
+            // Handle letter file upload
+            if ($request->hasFile('letter_file')) {
+                if ($outgoingLetter->letter_file) {
+                    Storage::disk('public')->delete($outgoingLetter->letter_file);
                 }
-                $path = $request->file('attachment')->store('attachments/outgoing', 'public');
-                $validated['attachment'] = $path;
+                $letterPath = $request->file('letter_file')->store('letters/outgoing', 'public');
+                $validated['letter_file'] = $letterPath;
+            }
+
+            // Handle multiple attachments
+            if ($request->hasFile('attachments')) {
+                // Delete old attachments
+                if ($outgoingLetter->attachment) {
+                    $oldAttachments = json_decode($outgoingLetter->attachment, true);
+                    foreach ($oldAttachments as $oldPath) {
+                        Storage::disk('public')->delete($oldPath);
+                    }
+                }
+
+                // Upload new attachments
+                $attachmentPaths = [];
+                foreach ($request->file('attachments') as $file) {
+                    $path = $file->store('attachments/outgoing', 'public');
+                    $attachmentPaths[] = $path;
+                }
+                $validated['attachment'] = json_encode($attachmentPaths);
             }
 
             $outgoingLetter->update($validated);
 
-            // Cek apakah sudah ada surat masuk terkait
+            // Check if there's a related incoming letter
             $existingIncomingLetter = IncomingLetter::where('related_outgoing_letter_id', $outgoingLetter->id)->first();
             
-            if (!$existingIncomingLetter) {
-                // Get recipient user (jika tidak ada, gunakan Sekdes)
-                $recipient = User::whereHas('role', function($query) {
-                        $query->where('name', 'Sekdes');
-                    })
-                    ->where('village_id', auth()->user()->village_id)
-                    ->where('is_active', true)
-                    ->first();
-
-                if ($recipient) {
-                    // Buat surat masuk untuk penerima
-                    $incomingLetter = new IncomingLetter([
-                        'letter_number' => 'Draft-' . $outgoingLetter->id,
-                        'letter_date' => $outgoingLetter->letter_date,
-                        'received_date' => now(),
-                        'sender' => auth()->user()->name,
-                        'subject' => $outgoingLetter->subject,
-                        'description' => $outgoingLetter->content,
-                        'classification_id' => $outgoingLetter->classification_id,
-                        'attachment' => $outgoingLetter->attachment,
-                        'notes' => 'Surat ini dibuat oleh ' . auth()->user()->name,
-                        'created_by' => auth()->id(),
-                        'village_id' => $recipient->village_id,
-                        'sender_village_id' => auth()->user()->village_id,
-                        'receiver_village_id' => $recipient->village_id,
-                        'receiver_user_id' => $recipient->id,
-                        'related_outgoing_letter_id' => $outgoingLetter->id,
-                        'status' => 'received',
-                    ]);
-
-                    $incomingLetter->save();
-                }
-            } else {
+            if ($existingIncomingLetter) {
                 // Update existing incoming letter with new data
                 $existingIncomingLetter->letter_date = $outgoingLetter->letter_date;
                 $existingIncomingLetter->subject = $outgoingLetter->subject;
                 $existingIncomingLetter->description = $outgoingLetter->content;
                 $existingIncomingLetter->classification_id = $outgoingLetter->classification_id;
                 $existingIncomingLetter->confidentiality = $outgoingLetter->confidentiality;
+                $existingIncomingLetter->letter_file = $outgoingLetter->letter_file;
                 if ($outgoingLetter->attachment) {
                     $existingIncomingLetter->attachment = $outgoingLetter->attachment;
                 }
@@ -339,7 +346,25 @@ class OutgoingLetterController extends Controller
             abort(404, 'File tidak ditemukan.');
         }
 
-        return Storage::disk('public')->download($outgoingLetter->attachment);
+        // If attachment is a JSON string of multiple files, download the first one
+        $attachments = json_decode($outgoingLetter->attachment, true);
+        $path = is_array($attachments) ? $attachments[0] : $outgoingLetter->attachment;
+
+        return Storage::disk('public')->download($path);
+    }
+
+    /**
+     * Download letter file.
+     */
+    public function downloadLetterFile(OutgoingLetter $outgoingLetter)
+    {
+        $this->authorize('view', $outgoingLetter);
+
+        if (!$outgoingLetter->letter_file) {
+            abort(404, 'File surat tidak ditemukan.');
+        }
+
+        return Storage::disk('public')->download($outgoingLetter->letter_file);
     }
 
     /**

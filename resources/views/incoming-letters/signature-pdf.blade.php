@@ -76,11 +76,11 @@
 
         <div class="signature-box">
             <p style="font-weight: bold; font-size: 16px;">
-                {{ $incomingLetter->kades ? $incomingLetter->kades->name : 'Kades' }}</p>
+                {{ $incomingLetter->kades ? $incomingLetter->kades->name : 'Kepala Desa' }}</p>
             @if ($incomingLetter->kades && $incomingLetter->kades->signature)
                 <div style="margin: 10px auto;">
-                    <img src="{{ public_path('storage/' . $incomingLetter->kades->signature) }}" alt="Tanda Tangan Kades"
-                        style="height: 60px; margin: 0 auto; display: block;">
+                    <img src="{{ public_path('storage/' . $incomingLetter->kades->signature) }}"
+                        alt="Tanda Tangan Kepala Desa" style="height: 60px; margin: 0 auto; display: block;">
                 </div>
             @else
                 <div class="signature-line"></div>

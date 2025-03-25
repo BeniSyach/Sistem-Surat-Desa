@@ -84,20 +84,34 @@
 
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text">File Surat</span>
+                            <span class="label-text">Surat</span>
                         </label>
                         <input type="file" name="letter_file" class="file-input file-input-bordered w-full"
-                            accept=".pdf,.doc,.docx" {{ isset($incomingLetter) ? '' : 'required' }}>
+                            accept=".doc,.docx,.pdf,.xls,.xlsx" required>
+                        <label class="label">
+                            <span class="label-text-alt">Format: DOC, DOCX, PDF, XLS, XLSX (Max: 2MB)</span>
+                        </label>
                         @error('letter_file')
                             <label class="label">
                                 <span class="label-text-alt text-error">{{ $message }}</span>
                             </label>
                         @enderror
-                        @if (isset($incomingLetter) && $incomingLetter->letter_file)
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Lampiran (Opsional)</span>
+                        </label>
+                        <input type="file" name="attachment" class="file-input file-input-bordered w-full"
+                            accept=".pdf">
+                        <label class="label">
+                            <span class="label-text-alt">Format: PDF (Max: 2MB)</span>
+                        </label>
+                        @error('attachment')
                             <label class="label">
-                                <span class="label-text-alt">File saat ini: {{ $incomingLetter->letter_file }}</span>
+                                <span class="label-text-alt text-error">{{ $message }}</span>
                             </label>
-                        @endif
+                        @enderror
                     </div>
                 </div>
 

@@ -51,7 +51,13 @@ class IncomingLetterController extends Controller
         $villages = Village::all();
         $users = User::with(['role', 'village'])
             ->where('is_active', true)
-            ->whereIn('role_id', [1, 2, 3]) // 1=kades, 2=sekdes, 3=kasi
+            ->whereHas('role', function($query) {
+                $query->whereIn('name', [
+                    'Menandatangani Surat',
+                    'Memparaf Surat',
+                    'Pembuat Surat',
+                ]);
+            })
             ->get();
 
         return view('incoming-letters.create', compact('classifications', 'villages', 'users'));
@@ -60,11 +66,16 @@ class IncomingLetterController extends Controller
     public function getUsersByVillage(Village $village)
     {
         $users = User::where('is_active', true)
-            ->whereIn('role_id', [1, 2, 3]) // 1=kades, 2=sekdes, 3=kasi
-            ->with(['role', 'village']) // eager load role and village relations
+            ->whereHas('role', function($query) {
+                $query->whereIn('name', [
+                    'Menandatangani Surat',
+                    'Memparaf Surat',
+                    'Pembuat Surat'
+                ]);
+            })
+            ->with(['role', 'village'])
             ->get()
             ->map(function ($user) {
-                // Tambahkan informasi desa ke nama user
                 $user->name = $user->name . ' (' . $user->village->name . ')';
                 return $user;
             });
@@ -88,7 +99,8 @@ class IncomingLetterController extends Controller
             'description' => 'required|string',
             'classification_id' => 'required|exists:letter_classifications,id',
             'confidentiality' => 'required|in:biasa,rahasia,umum',
-            'attachment' => 'required|file|mimes:pdf|max:2048',
+            'letter_file' => 'required|file|mimes:doc,docx,pdf,xls,xlsx|max:2048',
+            'attachment' => 'nullable|file|mimes:pdf|max:2048',
             'notes' => 'nullable|string',
             'sender_village_id' => 'required|exists:villages,id',
             'receiver_user_id' => 'required|exists:users,id',
@@ -101,9 +113,16 @@ class IncomingLetterController extends Controller
         $validated['created_by'] = auth()->id();
         $validated['village_id'] = auth()->user()->village_id;
 
+        // Handle letter file upload
+        if ($request->hasFile('letter_file')) {
+            $letterPath = $request->file('letter_file')->store('letters/incoming', 'public');
+            $validated['letter_file'] = $letterPath;
+        }
+
+        // Handle attachment upload
         if ($request->hasFile('attachment')) {
-            $path = $request->file('attachment')->store('attachments/incoming', 'public');
-            $validated['attachment'] = $path;
+            $attachmentPath = $request->file('attachment')->store('attachments/incoming', 'public');
+            $validated['attachment'] = $attachmentPath;
         }
 
         $incomingLetter = IncomingLetter::create($validated);
@@ -160,16 +179,27 @@ class IncomingLetterController extends Controller
             'description' => 'required|string',
             'classification_id' => 'required|exists:letter_classifications,id',
             'confidentiality' => 'required|in:biasa,rahasia,umum',
+            'letter_file' => 'nullable|file|mimes:doc,docx,pdf,xls,xlsx|max:2048',
             'attachment' => 'nullable|file|mimes:pdf|max:2048',
             'notes' => 'nullable|string',
         ]);
 
+        // Handle letter file upload
+        if ($request->hasFile('letter_file')) {
+            if ($incomingLetter->letter_file) {
+                Storage::disk('public')->delete($incomingLetter->letter_file);
+            }
+            $letterPath = $request->file('letter_file')->store('letters/incoming', 'public');
+            $validated['letter_file'] = $letterPath;
+        }
+
+        // Handle attachment upload
         if ($request->hasFile('attachment')) {
             if ($incomingLetter->attachment) {
-                Storage::delete($incomingLetter->attachment);
+                Storage::disk('public')->delete($incomingLetter->attachment);
             }
-            $path = $request->file('attachment')->store('attachments/incoming');
-            $validated['attachment'] = $path;
+            $attachmentPath = $request->file('attachment')->store('attachments/incoming', 'public');
+            $validated['attachment'] = $attachmentPath;
         }
 
         $incomingLetter->update($validated);
@@ -206,6 +236,20 @@ class IncomingLetterController extends Controller
         }
 
         return Storage::disk('public')->download($incomingLetter->attachment);
+    }
+
+    /**
+     * Download the final letter file.
+     */
+    public function downloadFinal(IncomingLetter $incomingLetter)
+    {
+        $this->authorize('view', $incomingLetter);
+
+        if (!$incomingLetter->letter_file) {
+            abort(404, 'File surat final tidak ditemukan.');
+        }
+
+        return Storage::disk('public')->download($incomingLetter->letter_file);
     }
 
     /**
@@ -254,7 +298,7 @@ class IncomingLetterController extends Controller
             'to_user_id' => 'required|array',
             'to_user_id.*' => 'exists:users,id',
             'notes' => 'nullable|string',
-            'attachment' => 'nullable|file|mimes:pdf|max:2048',
+            'attachment' => 'required|file|mimes:pdf|max:2048', // Changed to required since this is the final letter
         ]);
 
         try {
@@ -266,6 +310,7 @@ class IncomingLetterController extends Controller
                 // Create a new incoming letter as a disposition for the recipient
                 $dispositionLetter = new IncomingLetter([
                     'letter_number' => $incomingLetter->letter_number,
+                    'final_letter_number' => $incomingLetter->final_letter_number,
                     'letter_date' => now(),
                     'received_date' => now(),
                     'sender' => auth()->user()->name . ' (' . auth()->user()->role->name . ')',
@@ -282,16 +327,14 @@ class IncomingLetterController extends Controller
                     'status' => 'processed', // Set status to finish
                 ]);
 
-                // Handle attachment
+                // Handle final letter with QR code and signature
                 if ($request->hasFile('attachment')) {
                     // Store attachment once and reuse the path
                     if (!isset($attachmentPath)) {
                         $attachmentPath = $request->file('attachment')->store('attachments/dispositions', 'public');
                     }
-                    $dispositionLetter->attachment = $attachmentPath;
-                } else if ($incomingLetter->attachment) {
-                    // Use the original letter's attachment if no new one is provided
                     $dispositionLetter->attachment = $incomingLetter->attachment;
+                    $dispositionLetter->letter_file = $attachmentPath; // Set letter_file to the same file
                 }
 
                 $dispositionLetter->save();
@@ -313,11 +356,10 @@ class IncomingLetterController extends Controller
                     'signer_id' => auth()->id(),
                 ]);
 
-                // Handle attachment for outgoing letter
+                // Handle final letter for outgoing letter
                 if (isset($attachmentPath)) {
                     $outgoingLetter->attachment = $attachmentPath;
-                } else if ($incomingLetter->attachment) {
-                    $outgoingLetter->attachment = $incomingLetter->attachment;
+                    $outgoingLetter->letter_file = $attachmentPath; // Set letter_file to the same file
                 }
 
                 $outgoingLetter->save();
@@ -483,6 +525,7 @@ class IncomingLetterController extends Controller
             $rejectionLetter = new IncomingLetter([
                 'letter_number' => 'Rejected-' . $incomingLetter->id,
                 'letter_date' => now(),
+                'letter_file' => $incomingLetter->letter_file,
                 'received_date' => now(),
                 'sender' => auth()->user()->name . ' (Sekdes)',
                 'subject' => 'Penolakan: ' . $incomingLetter->subject. ' Dengan Alasan'.$request->approval_notes,
@@ -523,14 +566,14 @@ class IncomingLetterController extends Controller
 
         // Find Kades user from the same village
         $kades = User::whereHas('role', function($query) {
-                $query->where('name', 'Kades');
+                $query->where('name', 'Menandatangani Surat');
             })
             ->where('village_id', auth()->user()->village_id)
             ->where('is_active', true)
             ->first();
 
         if (!$kades) {
-            return redirect()->back()->with('error', 'Tidak dapat menemukan Kades yang aktif di desa Anda.');
+            return redirect()->back()->with('error', 'Tidak dapat menemukan Kepala Desa yang aktif di desa Anda.');
         }
 
         // Update the letter status
@@ -545,13 +588,13 @@ class IncomingLetterController extends Controller
             'letter_number' => $incomingLetter->letter_number,
             'letter_date' => $incomingLetter->letter_date,
             'received_date' => now(),
-            'sender' => auth()->user()->name . ' (Sekdes)',
+            'sender' => auth()->user()->name . ' (Sekretaris Desa)',
             'subject' => $incomingLetter->subject,
             'description' => $incomingLetter->description,
             'classification_id' => $incomingLetter->classification_id,
             'confidentiality' => $incomingLetter->confidentiality,
             'attachment' => $incomingLetter->attachment,
-            'notes' => $request->notes ?? 'Diteruskan dari Sekdes',
+            'notes' => $request->notes ?? 'Diteruskan dari Sekretaris Desa',
             'created_by' => auth()->id(),
             'village_id' => $kades->village_id,
             'sender_village_id' => auth()->user()->village_id,
@@ -563,7 +606,7 @@ class IncomingLetterController extends Controller
         $kadesLetter->save();
 
         return redirect()->route('incoming-letters.show', $incomingLetter)
-            ->with('success', 'Surat berhasil diparaf dan diteruskan ke Kades.');
+            ->with('success', 'Surat berhasil diparaf dan diteruskan ke Kepala Desa.');
     }
 
     /**
@@ -596,6 +639,7 @@ class IncomingLetterController extends Controller
                 'department_id' => auth()->user()->department_id ?? 1, // Default ke department_id 1 jika tidak ada
                 'village_id' => auth()->user()->village_id,
                 'created_by' => auth()->id(),
+                'letter_file' => $incomingLetter->letter_file,
                 'status' => OutgoingLetter::STATUS_PROCESSED, // Langsung diproses karena ini hanya riwayat
                 'processed_at' => now(),
                 'processed_by' => auth()->id(),
@@ -626,6 +670,7 @@ class IncomingLetterController extends Controller
                 'receiver_village_id' => $toUser->village_id,
                 'receiver_user_id' => $toUser->id,
                 'status' => $status,
+                'letter_file' => $incomingLetter->letter_file,
                 'related_incoming_letter_id' => $incomingLetter->id,
                 'related_outgoing_letter_id' => $outgoingLetter->id,
                 'sekdes_id' =>  auth()->id(),
@@ -880,7 +925,8 @@ class IncomingLetterController extends Controller
                 'letter_number' => 'Rejected-' . $incomingLetter->id,
                 'letter_date' => now(),
                 'received_date' => now(),
-                'sender' => auth()->user()->name . ' (Sekdes)',
+                'letter_file' => $incomingLetter->letter_file,
+                'sender' => auth()->user()->name . ' (Kades)',
                 'subject' => 'Penolakan: ' . $incomingLetter->subject. ' Dengan Alasan'.$request->approval_notes,
                 'description' => $incomingLetter->description,
                 'classification_id' => $incomingLetter->classification_id,

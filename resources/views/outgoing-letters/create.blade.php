@@ -166,6 +166,26 @@
                 </div>
 
                 <div class="form-control">
+                    <label class="label" for="letter_file">
+                        <span class="label-text flex items-center gap-1">
+                            <i class="fas fa-file-alt text-blue-500"></i> File Surat
+                            <span class="text-red-500">*</span>
+                        </span>
+                    </label>
+                    <input type="file" name="letter_file" id="letter_file"
+                        class="file-input file-input-bordered @error('letter_file') file-input-error @enderror"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx" required>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        <i class="fas fa-info-circle"></i> Maksimal 5MB, format PDF, DOC, DOCX, XLS, XLSX
+                    </p>
+                    @error('letter_file')
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ $message }}</span>
+                        </label>
+                    @enderror
+                </div>
+
+                <div class="form-control">
                     <label class="label" for="subject">
                         <span class="label-text flex items-center gap-1">
                             <i class="fas fa-envelope text-blue-500"></i> Perihal
@@ -185,7 +205,7 @@
                 <div class="form-control">
                     <label class="label" for="content">
                         <span class="label-text flex items-center gap-1">
-                            <i class="fas fa-align-left text-blue-500"></i> Isi Surat
+                            <i class="fas fa-align-left text-blue-500"></i> Ringkasan/Keterangan
                             <span class="text-red-500">*</span>
                         </span>
                     </label>
@@ -201,14 +221,15 @@
                 <div class="form-control">
                     <label class="label" for="attachment">
                         <span class="label-text flex items-center gap-1">
-                            <i class="fas fa-paperclip text-blue-500"></i> Lampiran (PDF)
+                            <i class="fas fa-paperclip text-blue-500"></i> Lampiran
                         </span>
                     </label>
                     <input type="file" name="attachment" id="attachment"
                         class="file-input file-input-bordered @error('attachment') file-input-error @enderror"
-                        accept=".pdf">
+                        accept=".pdf,.doc,.docx,.xls,.xlsx">
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        <i class="fas fa-info-circle"></i> Maksimal 2MB, format PDF
+                        <i class="fas fa-info-circle"></i> Maksimal 5MB per file, format PDF, DOC, DOCX, XLS, XLSX.
+                        Bisa upload lebih dari 1 file.
                     </p>
                     @error('attachment')
                         <label class="label">

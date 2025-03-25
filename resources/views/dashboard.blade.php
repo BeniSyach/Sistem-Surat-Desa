@@ -3,7 +3,7 @@
 
     <div class="container mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            @if (Auth::user()->hasRole('Admin'))
+            @if (Auth::user()->role->name === 'Admin')
                 <div
                     class="card bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden border-l-4 border-blue-500">
                     <div class="p-6">
@@ -114,7 +114,7 @@
                 </div>
             </div>
 
-            @if (Auth::user()->hasRole('Kasi'))
+            @if (Auth::user()->role->name === 'Pembuat Surat')
                 <div
                     class="card bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden border-l-4 border-gray-500">
                     <div class="p-6">
@@ -137,33 +137,9 @@
                         </div>
                     </div>
                 </div>
-
-                <div
-                    class="card bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden border-l-4 border-red-500">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Surat Ditolak</p>
-                                <h3 class="text-3xl font-bold text-gray-800 dark:text-white mt-1">
-                                    {{ $data['rejected_letters'] }}</h3>
-                            </div>
-                            <div
-                                class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                                <i class="fas fa-times-circle text-red-600 dark:text-red-400 text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="mt-4 text-sm text-gray-500 dark:text-gray-400">
-                            <span class="text-{{ $data['rejected_letters'] > 0 ? 'red' : 'green' }}-500 font-medium">
-                                <i
-                                    class="fas fa-{{ $data['rejected_letters'] > 0 ? 'exclamation-circle' : 'check-circle' }} mr-1"></i>
-                                {{ $data['rejected_letters'] > 0 ? 'Perlu revisi' : 'Tidak ada penolakan' }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
             @endif
 
-            @if (Auth::user()->hasRole('Sekdes'))
+            @if (Auth::user()->role->name === 'Memparaf Surat')
                 <div
                     class="card bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden border-l-4 border-orange-500">
                     <div class="p-6">
@@ -189,7 +165,7 @@
                 </div>
             @endif
 
-            @if (Auth::user()->hasRole('Kades'))
+            @if (Auth::user()->role->name === 'Menandatangani Surat')
                 <div
                     class="card bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden border-l-4 border-blue-500">
                     <div class="p-6">
@@ -215,7 +191,7 @@
                 </div>
             @endif
 
-            @if (Auth::user()->hasRole('Umum'))
+            @if (Auth::user()->role->name === 'Bagian Umum')
                 <div
                     class="card bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden border-l-4 border-teal-500">
                     <div class="p-6">
