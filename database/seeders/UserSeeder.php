@@ -26,6 +26,12 @@ class UserSeeder extends Seeder
         
         // Mapping of village names to staff data
         $villageStaffData = [
+            'Kecamatan Sei Rampah' => [
+                'Menandatangani Surat' => 'Camat Sei Rampah',
+                'Memparaf Surat' => 'Sekcam Sei Rampah',
+                'Pembuat Surat' => 'Kasi Sei Rampah',
+                'Bagian Umum' => 'Umum Sei Rampah'
+            ],
             'Desa Pergulaan' => [
                 'Menandatangani Surat' => 'Ari Wirawan',
                 'Memparaf Surat' => 'Sekdes Pergulaan',
