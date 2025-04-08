@@ -130,8 +130,7 @@ Route::get('outgoing-letters/{outgoingLetter}/download-attachment', [OutgoingLet
     ->name('outgoing-letters.download-attachment');
 Route::get('outgoing-letters/{outgoingLetter}/download-letter-file', [OutgoingLetterController::class, 'downloadLetterFile'])
     ->name('outgoing-letters.download-letter-file');
-Route::get('outgoing-letters/{outgoingLetter}/verify', [OutgoingLetterController::class, 'verify'])
-    ->name('outgoing-letters.verify');
+
 
 // Outgoing Letter Approval Routes (Pembuat Surat Only)
 Route::middleware(['role:Pembuat Surat'])->group(function () {
@@ -208,3 +207,6 @@ Route::post('/incoming-letters/dispositions/{disposition}/mark-as-read', [Incomi
     ->name('incoming-letters.dispositions.mark-as-read');
 Route::delete('/incoming-letters/dispositions/{disposition}', [IncomingLetterController::class, 'deleteDisposition'])
     ->name('incoming-letters.dispositions.delete');
+
+    Route::get('outgoing-letters/{outgoingLetter}/verify', [OutgoingLetterController::class, 'verify'])
+    ->name('outgoing-letters.verify');

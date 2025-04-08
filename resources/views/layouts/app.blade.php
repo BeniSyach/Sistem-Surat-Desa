@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Super Suket') }}</title>
+    <title>{{ config('app.name', 'PAKET SUTRA') }}</title>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -80,7 +80,7 @@
                     </label>
                 </div>
                 <div class="flex-1">
-                    <span class="text-xl font-bold text-primary">{{ config('app.name', 'Super Suket') }}</span>
+                    <span class="text-xl font-bold text-primary">{{ config('app.name', 'PAKET SUTRA') }}</span>
                 </div>
                 <div class="flex-none flex items-center gap-2">
                     <!-- Theme Toggle Button -->
@@ -169,8 +169,10 @@
                         </div>
                     </div>
                     <div class="text-center">
-                        <h1 class="text-xl font-bold text-primary dark:text-blue-400">Super Suket</h1>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Surat Pernyataan dan Surat Keterangan</p>
+                        <h1 class="text-xl font-bold text-primary dark:text-blue-400">PAKET SUTRA</h1>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Pelayanan Cepat Kecamatan untuk Surat
+                            Keterangan Masyarakat
+                        </p>
                     </div>
                 </div>
 

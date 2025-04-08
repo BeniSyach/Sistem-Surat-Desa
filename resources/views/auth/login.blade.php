@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Login - {{ config('app.name', 'Super Suket') }}</title>
+    <title>Login - {{ config('app.name', 'PAKET SUTRA') }}</title>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -53,8 +53,9 @@
                     <i class="fas fa-envelope-open-text text-white text-4xl"></i>
                 </div>
             </div>
-            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Super Suket</h1>
-            <p class="text-gray-600 dark:text-gray-300 mt-2">Surat Pernyataan dan Surat Keterangan</p>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">PAKET SUTRA</h1>
+            <p class="text-gray-600 dark:text-gray-300 mt-2">Pelayanan Cepat Kecamatan untuk Surat Keterangan Masyarakat
+            </p>
         </div>
 
         <div
@@ -128,7 +129,7 @@
         </div>
 
         <div class="mt-8 text-center text-gray-600 dark:text-gray-300 text-sm fade-in">
-            &copy; {{ date('Y') }} Super Suket. All rights reserved.
+            &copy; {{ date('Y') }} PAKET SUTRA. All rights reserved.
         </div>
     </div>
 

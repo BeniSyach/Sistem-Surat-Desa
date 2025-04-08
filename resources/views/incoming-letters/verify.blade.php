@@ -23,7 +23,7 @@
     <div class="verification-container">
         <div class="navbar bg-base-100 shadow-md rounded-box mb-4">
             <div class="flex-1">
-                <a class="btn btn-ghost normal-case text-xl">Super Suket</a>
+                <a class="btn btn-ghost normal-case text-xl">PAKET SUTRA</a>
             </div>
         </div>
 
@@ -127,7 +127,7 @@
 
         <footer class="footer footer-center p-4 bg-base-100 text-base-content mt-4 rounded-box">
             <div>
-                <p>Copyright © {{ date('Y') }} - Super Suket</p>
+                <p>Copyright © {{ date('Y') }} - PAKET SUTRA</p>
             </div>
         </footer>
     </div>
